@@ -9,6 +9,7 @@ const envSchema = z.object({
   AUTH_GOOGLE_SECRET: z.string().optional().default(""),
   NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional().default(""),
   VAPID_PRIVATE_KEY: z.string().optional().default(""),
+  CRON_SECRET: z.string().optional().default(""),
 });
 
 const parsed = envSchema.safeParse(process.env);

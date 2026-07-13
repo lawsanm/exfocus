@@ -14,6 +14,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
+          userId={session.user.id}
           name={session.user.name ?? null}
           email={session.user.email}
           image={session.user.image ?? null}
