@@ -236,7 +236,7 @@ CREATE TABLE "AvailableHours" (
 CREATE TABLE "StudySession" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "subjectId" TEXT NOT NULL,
+    "subjectId" TEXT,
     "assignmentId" TEXT,
     "examId" TEXT,
     "quizId" TEXT,
@@ -493,7 +493,7 @@ ALTER TABLE "AvailableHours" ADD CONSTRAINT "AvailableHours_userId_fkey" FOREIGN
 ALTER TABLE "StudySession" ADD CONSTRAINT "StudySession_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "StudySession" ADD CONSTRAINT "StudySession_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "StudySession" ADD CONSTRAINT "StudySession_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "StudySession" ADD CONSTRAINT "StudySession_assignmentId_fkey" FOREIGN KEY ("assignmentId") REFERENCES "Assignment"("id") ON DELETE CASCADE ON UPDATE CASCADE;

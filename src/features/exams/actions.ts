@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/infrastructure/db/prisma";
 import { requireUserId } from "@/lib/auth/require-user";
+import { regenerateSchedule } from "@/application/services/regenerate-schedule";
 import type { FormActionState } from "@/lib/form-action-state";
 import { examSchema, examTopicSchema } from "@/features/exams/schemas";
 
@@ -22,6 +23,7 @@ export async function createExamAction(
 
   await prisma.exam.create({ data: { ...parsed.data, userId } });
 
+  await regenerateSchedule(userId);
   revalidatePath("/exams");
   revalidatePath("/dashboard");
   return { success: true };
@@ -48,6 +50,7 @@ export async function updateExamAction(
   });
   if (count === 0) return { error: "Exam not found." };
 
+  await regenerateSchedule(userId);
   revalidatePath("/exams");
   revalidatePath(`/exams/${examId}`);
   revalidatePath("/dashboard");
@@ -57,6 +60,7 @@ export async function updateExamAction(
 export async function deleteExamAction(examId: string): Promise<void> {
   const userId = await requireUserId();
   await prisma.exam.deleteMany({ where: { id: examId, userId } });
+  await regenerateSchedule(userId);
   revalidatePath("/exams");
   revalidatePath("/dashboard");
 }
@@ -80,7 +84,9 @@ export async function addExamTopicAction(
 
   await prisma.examTopic.create({ data: { ...parsed.data, examId, order: maxOrder + 1 } });
 
+  await regenerateSchedule(userId);
   revalidatePath(`/exams/${examId}`);
+  revalidatePath("/dashboard");
   return { success: true };
 }
 
@@ -92,11 +98,15 @@ export async function toggleExamTopicAction(examId: string, topicId: string): Pr
   if (!topic) return;
 
   await prisma.examTopic.update({ where: { id: topicId }, data: { completed: !topic.completed } });
+  await regenerateSchedule(userId);
   revalidatePath(`/exams/${examId}`);
+  revalidatePath("/dashboard");
 }
 
 export async function deleteExamTopicAction(examId: string, topicId: string): Promise<void> {
   const userId = await requireUserId();
   await prisma.examTopic.deleteMany({ where: { id: topicId, exam: { id: examId, userId } } });
+  await regenerateSchedule(userId);
   revalidatePath(`/exams/${examId}`);
+  revalidatePath("/dashboard");
 }

@@ -181,8 +181,8 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     todaySessions: todaySessions.map((s) => ({
       id: s.id,
       topicLabel: s.topicLabel,
-      subjectName: s.subject.name,
-      subjectColor: s.subject.colorHex,
+      subjectName: s.subject?.name ?? "General",
+      subjectColor: s.subject?.colorHex ?? "#64748B",
       durationMinutes: s.durationMinutes,
       priorityLevel: s.priorityLevel,
       status: s.status,

@@ -1,16 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
 import { prisma } from "@/infrastructure/db/prisma";
+import { requireUserId } from "@/lib/auth/require-user";
+import { regenerateSchedule } from "@/application/services/regenerate-schedule";
 import { assignmentSchema } from "@/features/assignments/schemas";
 import type { FormActionState } from "@/lib/form-action-state";
-
-async function requireUserId() {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Not authenticated.");
-  return session.user.id;
-}
 
 function statusFromProgress(progressPercent: number): "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" {
   if (progressPercent >= 100) return "COMPLETED";
@@ -40,6 +35,7 @@ export async function createAssignmentAction(
     },
   });
 
+  await regenerateSchedule(userId);
   revalidatePath("/assignments");
   revalidatePath("/dashboard");
   return { success: true };
@@ -66,6 +62,7 @@ export async function updateAssignmentAction(
   });
   if (count === 0) return { error: "Assignment not found." };
 
+  await regenerateSchedule(userId);
   revalidatePath("/assignments");
   revalidatePath("/dashboard");
   return { success: true };
@@ -81,6 +78,7 @@ export async function updateAssignmentProgressAction(
     where: { id: assignmentId, userId },
     data: { progressPercent: clamped, status: statusFromProgress(clamped) },
   });
+  await regenerateSchedule(userId);
   revalidatePath("/assignments");
   revalidatePath("/dashboard");
 }
@@ -88,6 +86,7 @@ export async function updateAssignmentProgressAction(
 export async function deleteAssignmentAction(assignmentId: string): Promise<void> {
   const userId = await requireUserId();
   await prisma.assignment.deleteMany({ where: { id: assignmentId, userId } });
+  await regenerateSchedule(userId);
   revalidatePath("/assignments");
   revalidatePath("/dashboard");
 }

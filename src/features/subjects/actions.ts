@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/infrastructure/db/prisma";
 import { requireUserId } from "@/lib/auth/require-user";
+import { regenerateSchedule } from "@/application/services/regenerate-schedule";
 import type { FormActionState } from "@/lib/form-action-state";
 import { subjectSchema, topicSchema } from "@/features/subjects/schemas";
 
@@ -18,7 +19,9 @@ export async function createSubjectAction(
     data: { ...parsed.data, targetGrade: parsed.data.targetGrade || null, userId },
   });
 
+  await regenerateSchedule(userId);
   revalidatePath("/subjects");
+  revalidatePath("/dashboard");
   return { success: true };
 }
 
@@ -37,8 +40,10 @@ export async function updateSubjectAction(
   });
   if (count === 0) return { error: "Subject not found." };
 
+  await regenerateSchedule(userId);
   revalidatePath("/subjects");
   revalidatePath(`/subjects/${subjectId}`);
+  revalidatePath("/dashboard");
   return { success: true };
 }
 
@@ -48,7 +53,9 @@ export async function archiveSubjectAction(subjectId: string): Promise<void> {
     where: { id: subjectId, userId },
     data: { archivedAt: new Date() },
   });
+  await regenerateSchedule(userId);
   revalidatePath("/subjects");
+  revalidatePath("/dashboard");
 }
 
 export async function addTopicAction(
@@ -72,7 +79,9 @@ export async function addTopicAction(
     data: { ...parsed.data, subjectId, order: maxOrder + 1 },
   });
 
+  await regenerateSchedule(userId);
   revalidatePath(`/subjects/${subjectId}`);
+  revalidatePath("/dashboard");
   return { success: true };
 }
 
@@ -88,7 +97,9 @@ export async function toggleTopicAction(subjectId: string, topicId: string): Pro
     data: { completed: !topic.completed },
   });
 
+  await regenerateSchedule(userId);
   revalidatePath(`/subjects/${subjectId}`);
+  revalidatePath("/dashboard");
 }
 
 export async function deleteTopicAction(subjectId: string, topicId: string): Promise<void> {
@@ -96,5 +107,7 @@ export async function deleteTopicAction(subjectId: string, topicId: string): Pro
   await prisma.subjectTopic.deleteMany({
     where: { id: topicId, subject: { id: subjectId, userId } },
   });
+  await regenerateSchedule(userId);
   revalidatePath(`/subjects/${subjectId}`);
+  revalidatePath("/dashboard");
 }

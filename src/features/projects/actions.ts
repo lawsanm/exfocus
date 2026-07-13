@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/infrastructure/db/prisma";
 import { requireUserId } from "@/lib/auth/require-user";
+import { regenerateSchedule } from "@/application/services/regenerate-schedule";
 import type { FormActionState } from "@/lib/form-action-state";
 import { projectSchema } from "@/features/projects/schemas";
 
@@ -28,6 +29,7 @@ export async function createProjectAction(
 
   await prisma.project.create({ data: { ...parsed.data, userId } });
 
+  await regenerateSchedule(userId);
   revalidatePath("/projects");
   revalidatePath("/dashboard");
   return { success: true };
@@ -51,6 +53,7 @@ export async function updateProjectAction(
   });
   if (count === 0) return { error: "Project not found." };
 
+  await regenerateSchedule(userId);
   revalidatePath("/projects");
   revalidatePath("/dashboard");
   return { success: true };
@@ -66,6 +69,7 @@ export async function updateProjectProgressAction(
     where: { id: projectId, userId },
     data: { progressPercent: clamped },
   });
+  await regenerateSchedule(userId);
   revalidatePath("/projects");
   revalidatePath("/dashboard");
 }
@@ -73,6 +77,7 @@ export async function updateProjectProgressAction(
 export async function deleteProjectAction(projectId: string): Promise<void> {
   const userId = await requireUserId();
   await prisma.project.deleteMany({ where: { id: projectId, userId } });
+  await regenerateSchedule(userId);
   revalidatePath("/projects");
   revalidatePath("/dashboard");
 }

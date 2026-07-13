@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/infrastructure/db/prisma";
 import { requireUserId } from "@/lib/auth/require-user";
+import { regenerateSchedule } from "@/application/services/regenerate-schedule";
 import type { FormActionState } from "@/lib/form-action-state";
 import { quizSchema } from "@/features/quizzes/schemas";
 
@@ -22,6 +23,7 @@ export async function createQuizAction(
 
   await prisma.quiz.create({ data: { ...parsed.data, userId } });
 
+  await regenerateSchedule(userId);
   revalidatePath("/quizzes");
   revalidatePath("/dashboard");
   return { success: true };
@@ -48,6 +50,7 @@ export async function updateQuizAction(
   });
   if (count === 0) return { error: "Quiz not found." };
 
+  await regenerateSchedule(userId);
   revalidatePath("/quizzes");
   revalidatePath("/dashboard");
   return { success: true };
@@ -56,6 +59,7 @@ export async function updateQuizAction(
 export async function deleteQuizAction(quizId: string): Promise<void> {
   const userId = await requireUserId();
   await prisma.quiz.deleteMany({ where: { id: quizId, userId } });
+  await regenerateSchedule(userId);
   revalidatePath("/quizzes");
   revalidatePath("/dashboard");
 }
