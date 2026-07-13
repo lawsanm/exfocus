@@ -11,6 +11,7 @@ import { UpcomingDeadlinesCard } from "@/features/dashboard/components/upcoming-
 import { RiskAlertCard } from "@/features/dashboard/components/risk-alert-card";
 import { RecommendationCard } from "@/features/dashboard/components/recommendation-card";
 import { QuickActions } from "@/features/dashboard/components/quick-actions";
+import { FadeInUp } from "@/components/motion/motion-primitives";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -29,12 +30,18 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <WelcomeHeader name={data.user.name} />
-        <QuickActions />
-      </div>
+      <FadeInUp>
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <WelcomeHeader name={data.user.name} />
+          <QuickActions />
+        </div>
+      </FadeInUp>
 
-      <RiskAlertCard risks={insights.risks} />
+      {insights.risks.length > 0 && (
+        <FadeInUp delay={0.05}>
+          <RiskAlertCard risks={insights.risks} />
+        </FadeInUp>
+      )}
 
       <StatTiles
         xp={data.user.xp}
@@ -44,18 +51,26 @@ export default async function DashboardPage() {
         monthlyFocusMinutes={data.monthlyFocusMinutes}
       />
 
-      <TodayProductivityTiles
-        todayFocusMinutes={data.todayFocusMinutes}
-        todayFocusSessionCount={data.todayFocusSessionCount}
-        dailyGoalHours={data.user.dailyGoalHours}
-      />
+      <FadeInUp delay={0.1}>
+        <TodayProductivityTiles
+          todayFocusMinutes={data.todayFocusMinutes}
+          todayFocusSessionCount={data.todayFocusSessionCount}
+          dailyGoalHours={data.user.dailyGoalHours}
+        />
+      </FadeInUp>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <TodayPlanCard sessions={data.todaySessions} />
-        <UpcomingDeadlinesCard deadlines={data.upcomingDeadlines} />
-      </div>
+      <FadeInUp delay={0.15}>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <TodayPlanCard sessions={data.todaySessions} />
+          <UpcomingDeadlinesCard deadlines={data.upcomingDeadlines} />
+        </div>
+      </FadeInUp>
 
-      <RecommendationCard recommendation={insights.recommendation} />
+      {insights.recommendation && (
+        <FadeInUp delay={0.2}>
+          <RecommendationCard recommendation={insights.recommendation} />
+        </FadeInUp>
+      )}
     </div>
   );
 }

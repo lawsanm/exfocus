@@ -10,7 +10,7 @@ export function RecommendationCard({
   if (!recommendation) return null;
 
   return (
-    <Card>
+    <Card className="hover-lift">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Lightbulb className="text-xp-foreground size-4" aria-hidden="true" />

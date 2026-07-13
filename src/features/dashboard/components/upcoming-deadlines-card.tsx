@@ -32,7 +32,7 @@ function formatDaysRemaining(days: number): string {
 
 export function UpcomingDeadlinesCard({ deadlines }: { deadlines: UpcomingDeadlineDto[] }) {
   return (
-    <Card>
+    <Card className="hover-lift h-full">
       <CardHeader>
         <CardTitle>Upcoming deadlines</CardTitle>
       </CardHeader>

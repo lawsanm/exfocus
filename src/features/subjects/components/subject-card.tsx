@@ -17,7 +17,7 @@ export function SubjectCard({ subject }: { subject: SubjectListItem }) {
     subject._count.projects;
 
   return (
-    <Card className="group relative">
+    <Card className="hover-lift group relative h-full">
       <CardHeader className="flex-row items-start justify-between gap-2">
         <Link href={`/subjects/${subject.id}`} className="flex min-w-0 items-center gap-2.5">
           <span

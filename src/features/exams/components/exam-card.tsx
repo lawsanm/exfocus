@@ -21,7 +21,7 @@ export function ExamCard({ exam }: { exam: ExamListItem }) {
   const date = new Date(exam.date);
 
   return (
-    <Card>
+    <Card className="hover-lift h-full">
       <CardHeader className="flex-row items-start justify-between gap-2">
         <Link href={`/exams/${exam.id}`} className="flex min-w-0 items-center gap-2.5">
           <span

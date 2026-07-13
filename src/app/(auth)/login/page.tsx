@@ -13,9 +13,9 @@ export default function LoginPage() {
   const googleEnabled = Boolean(env.AUTH_GOOGLE_ID);
 
   return (
-    <Card>
+    <Card className="glass shadow-elevated border-transparent">
       <CardHeader>
-        <CardTitle className="text-xl">Welcome back</CardTitle>
+        <CardTitle className="text-2xl">Welcome back</CardTitle>
         <CardDescription>Sign in to get back to your study plan.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

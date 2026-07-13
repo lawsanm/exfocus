@@ -18,7 +18,7 @@ export function ProjectCard({
   const isOverdue = deadline < new Date() && project.progressPercent < 100;
 
   return (
-    <Card>
+    <Card className="hover-lift h-full">
       <CardHeader className="flex-row items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5">
           <span

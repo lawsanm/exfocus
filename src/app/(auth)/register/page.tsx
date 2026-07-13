@@ -13,9 +13,9 @@ export default function RegisterPage() {
   const googleEnabled = Boolean(env.AUTH_GOOGLE_ID);
 
   return (
-    <Card>
+    <Card className="glass shadow-elevated border-transparent">
       <CardHeader>
-        <CardTitle className="text-xl">Create your account</CardTitle>
+        <CardTitle className="text-2xl">Create your account</CardTitle>
         <CardDescription>
           Set up your subjects, deadlines, and study goals in a couple of minutes.
         </CardDescription>

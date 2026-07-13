@@ -17,7 +17,7 @@ export function TodayPlanCard({ sessions }: { sessions: TodayStudySessionDto[] }
   const totalMinutes = sessions.reduce((sum, s) => sum + s.durationMinutes, 0);
 
   return (
-    <Card>
+    <Card className="hover-lift h-full">
       <CardHeader>
         <CardTitle>Today&apos;s study plan</CardTitle>
       </CardHeader>

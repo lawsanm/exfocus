@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { NAV_GROUPS } from "@/components/layout/nav-config";
 
@@ -23,12 +24,19 @@ export function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
                 onClick={onNavigate}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  "relative flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-primary/10 text-primary"
+                    ? "text-primary"
                     : "text-foreground/80 hover:bg-accent hover:text-accent-foreground",
                 )}
               >
+                {isActive && (
+                  <motion.span
+                    layoutId="nav-active"
+                    className="bg-primary/10 absolute inset-0 -z-10 rounded-md"
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  />
+                )}
                 <Icon className="size-4" aria-hidden="true" />
                 {item.label}
               </Link>

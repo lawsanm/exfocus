@@ -21,7 +21,7 @@ export function MobileNav() {
       <SheetContent side="left" className="w-72 p-0">
         <SheetHeader className="h-16 justify-center border-b px-5">
           <SheetTitle className="flex items-center gap-2 font-semibold tracking-tight">
-            <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
+            <span className="bg-gradient-brand flex size-8 items-center justify-center rounded-lg text-white">
               <GraduationCap className="size-5" aria-hidden="true" />
             </span>
             exfocus

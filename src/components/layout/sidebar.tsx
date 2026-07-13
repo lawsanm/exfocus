@@ -7,7 +7,7 @@ export function Sidebar() {
     <aside className="bg-sidebar hidden w-64 shrink-0 flex-col border-r md:flex">
       <div className="flex h-16 items-center gap-2 border-b px-5">
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold tracking-tight">
-          <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
+          <span className="bg-gradient-brand flex size-8 items-center justify-center rounded-lg text-white">
             <GraduationCap className="size-5" aria-hidden="true" />
           </span>
           exfocus
