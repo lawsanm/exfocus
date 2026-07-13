@@ -37,6 +37,8 @@ export interface DashboardData {
   upcomingDeadlines: UpcomingDeadlineDto[];
   weeklyFocusMinutes: number;
   monthlyFocusMinutes: number;
+  todayFocusMinutes: number;
+  todayFocusSessionCount: number;
   subjectCount: number;
   activeTaskCount: number;
 }
@@ -75,6 +77,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     quizzes,
     weeklyFocus,
     monthlyFocus,
+    todayFocus,
     subjectCount,
     activeTaskCount,
   ] = await Promise.all([
@@ -130,6 +133,11 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     prisma.focusSession.aggregate({
       where: { userId, startedAt: { gte: monthStart, lte: monthEnd }, completed: true },
       _sum: { actualMinutes: true },
+    }),
+    prisma.focusSession.aggregate({
+      where: { userId, startedAt: { gte: todayStart, lt: todayEnd }, completed: true },
+      _sum: { actualMinutes: true },
+      _count: true,
     }),
     prisma.subject.count({ where: { userId, archivedAt: null } }),
     prisma.assignment.count({ where: { userId, status: { not: "COMPLETED" } } }),
@@ -191,6 +199,8 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     upcomingDeadlines: deadlines,
     weeklyFocusMinutes: weeklyFocus._sum.actualMinutes ?? 0,
     monthlyFocusMinutes: monthlyFocus._sum.actualMinutes ?? 0,
+    todayFocusMinutes: todayFocus._sum.actualMinutes ?? 0,
+    todayFocusSessionCount: todayFocus._count,
     subjectCount,
     activeTaskCount,
   };

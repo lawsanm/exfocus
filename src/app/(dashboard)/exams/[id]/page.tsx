@@ -4,13 +4,15 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/infrastructure/db/prisma";
-import { getExamDetail } from "@/infrastructure/repositories/exam-repository";
+import { getExamDetail, getExamHoursStudied } from "@/infrastructure/repositories/exam-repository";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { DifficultyBadge } from "@/components/shared/difficulty-badge";
 import { ExamFormDialog } from "@/features/exams/components/exam-form-dialog";
 import { ExamTopicsManager } from "@/features/exams/components/exam-topics-manager";
+import { ReadinessScoreCard } from "@/features/exams/components/readiness-score-card";
 import { computePreparationPercent } from "@/lib/preparation";
+import { computeExamReadiness } from "@/application/services/readiness-score";
 
 export const metadata: Metadata = {
   title: "Exam",
@@ -32,6 +34,8 @@ export default async function ExamDetailPage({ params }: { params: Promise<{ id:
   if (!exam) notFound();
 
   const preparation = computePreparationPercent(exam.preparationPercent, exam.topics);
+  const hoursStudied = await getExamHoursStudied(exam.id);
+  const readiness = computeExamReadiness(preparation, hoursStudied, exam.estimatedHours);
   const date = new Date(exam.date);
 
   return (
@@ -57,26 +61,37 @@ export default async function ExamDetailPage({ params }: { params: Promise<{ id:
         <ExamFormDialog subjects={subjects} exam={exam} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card>
-          <CardContent className="py-4">
-            <p className="text-muted-foreground text-xs">Preparation</p>
-            <p className="text-2xl font-semibold tabular-nums">{preparation}%</p>
-            <Progress value={preparation} className="mt-2" />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-4">
-            <p className="text-muted-foreground text-xs">Grade weight</p>
-            <p className="text-2xl font-semibold tabular-nums">{exam.weight}%</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-4">
-            <p className="text-muted-foreground text-xs">Estimated hours</p>
-            <p className="text-2xl font-semibold tabular-nums">{exam.estimatedHours}h</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ReadinessScoreCard readiness={readiness} />
+        <div className="grid grid-cols-2 gap-4">
+          <Card>
+            <CardContent className="py-4">
+              <p className="text-muted-foreground text-xs">Preparation</p>
+              <p className="text-2xl font-semibold tabular-nums">{preparation}%</p>
+              <Progress value={preparation} className="mt-2" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4">
+              <p className="text-muted-foreground text-xs">Grade weight</p>
+              <p className="text-2xl font-semibold tabular-nums">{exam.weight}%</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4">
+              <p className="text-muted-foreground text-xs">Estimated hours</p>
+              <p className="text-2xl font-semibold tabular-nums">{exam.estimatedHours}h</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4">
+              <p className="text-muted-foreground text-xs">Hours studied</p>
+              <p className="text-2xl font-semibold tabular-nums">
+                {Math.round(hoursStudied * 10) / 10}h
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <Card>

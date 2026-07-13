@@ -23,3 +23,11 @@ export function getExamDetail(userId: string, examId: string) {
 
 export type ExamListItem = Awaited<ReturnType<typeof listExams>>[number];
 export type ExamDetail = NonNullable<Awaited<ReturnType<typeof getExamDetail>>>;
+
+export async function getExamHoursStudied(examId: string): Promise<number> {
+  const result = await prisma.focusSession.aggregate({
+    where: { examId, completed: true },
+    _sum: { actualMinutes: true },
+  });
+  return (result._sum.actualMinutes ?? 0) / 60;
+}
