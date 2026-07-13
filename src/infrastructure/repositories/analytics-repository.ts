@@ -1,4 +1,6 @@
+import { startOfWeek } from "date-fns";
 import { prisma } from "@/infrastructure/db/prisma";
+import { computePreparationPercent } from "@/lib/preparation";
 
 export interface DailyMinutes {
   date: string; // yyyy-mm-dd
@@ -125,4 +127,63 @@ export async function getWeeklyProductivity(
     result.push({ weekStart: key, minutes: byWeek.get(key) ?? 0 });
   }
   return result;
+}
+
+export interface WeeklyReportData {
+  hoursThisWeek: number;
+  hoursLastWeek: number;
+  tasksCompleted: number;
+  currentStreak: number;
+  weakestSubject: { name: string; preparationPercent: number } | null;
+  bestSubject: { name: string; preparationPercent: number } | null;
+}
+
+export async function getWeeklyReportData(userId: string): Promise<WeeklyReportData> {
+  const now = new Date();
+  const thisWeekStart = startOfWeek(now, { weekStartsOn: 1 });
+  const lastWeekStart = new Date(thisWeekStart);
+  lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+
+  const [thisWeekFocus, lastWeekFocus, assignmentsDone, projectsDone, user, subjects] =
+    await Promise.all([
+      prisma.focusSession.aggregate({
+        where: { userId, completed: true, startedAt: { gte: thisWeekStart } },
+        _sum: { actualMinutes: true },
+      }),
+      prisma.focusSession.aggregate({
+        where: { userId, completed: true, startedAt: { gte: lastWeekStart, lt: thisWeekStart } },
+        _sum: { actualMinutes: true },
+      }),
+      prisma.assignment.count({
+        where: { userId, status: "COMPLETED", updatedAt: { gte: thisWeekStart } },
+      }),
+      prisma.project.count({
+        where: { userId, progressPercent: 100, updatedAt: { gte: thisWeekStart } },
+      }),
+      prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { currentStreak: true } }),
+      prisma.subject.findMany({
+        where: { userId, archivedAt: null },
+        include: { topics: true },
+      }),
+    ]);
+
+  const subjectPreparations = subjects
+    .map((s) => ({
+      name: s.name,
+      preparationPercent: computePreparationPercent(s.preparationPercent, s.topics),
+    }))
+    .filter((s) => s.preparationPercent > 0 || subjects.length > 0);
+
+  const sorted = [...subjectPreparations].sort(
+    (a, b) => a.preparationPercent - b.preparationPercent,
+  );
+
+  return {
+    hoursThisWeek: Math.round(((thisWeekFocus._sum.actualMinutes ?? 0) / 60) * 10) / 10,
+    hoursLastWeek: Math.round(((lastWeekFocus._sum.actualMinutes ?? 0) / 60) * 10) / 10,
+    tasksCompleted: assignmentsDone + projectsDone,
+    currentStreak: user.currentStreak,
+    weakestSubject: sorted[0] ?? null,
+    bestSubject: sorted[sorted.length - 1] ?? null,
+  };
 }

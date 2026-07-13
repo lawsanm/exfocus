@@ -7,12 +7,14 @@ import {
   getDailyFocusMinutes,
   getSubjectDistribution,
   getWeeklyProductivity,
+  getWeeklyReportData,
 } from "@/infrastructure/repositories/analytics-repository";
 import { StudyHoursChart } from "@/features/analytics/components/study-hours-chart";
 import { SubjectDistributionChart } from "@/features/analytics/components/subject-distribution-chart";
 import { WeeklyProductivityChart } from "@/features/analytics/components/weekly-productivity-chart";
 import { StudyHeatmap } from "@/features/analytics/components/study-heatmap";
 import { CompletedTasksSummary } from "@/features/analytics/components/completed-tasks-summary";
+import { WeeklyReportCard } from "@/features/analytics/components/weekly-report-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Flame } from "lucide-react";
 
@@ -24,17 +26,24 @@ export default async function AnalyticsPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const [dailyMinutes, subjectDistribution, completedTasks, weeklyProductivity, user] =
-    await Promise.all([
-      getDailyFocusMinutes(session.user.id, 90),
-      getSubjectDistribution(session.user.id),
-      getCompletedTaskCounts(session.user.id),
-      getWeeklyProductivity(session.user.id, 8),
-      prisma.user.findUniqueOrThrow({
-        where: { id: session.user.id },
-        select: { currentStreak: true, longestStreak: true },
-      }),
-    ]);
+  const [
+    dailyMinutes,
+    subjectDistribution,
+    completedTasks,
+    weeklyProductivity,
+    weeklyReport,
+    user,
+  ] = await Promise.all([
+    getDailyFocusMinutes(session.user.id, 90),
+    getSubjectDistribution(session.user.id),
+    getCompletedTaskCounts(session.user.id),
+    getWeeklyProductivity(session.user.id, 8),
+    getWeeklyReportData(session.user.id),
+    prisma.user.findUniqueOrThrow({
+      where: { id: session.user.id },
+      select: { currentStreak: true, longestStreak: true },
+    }),
+  ]);
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
@@ -42,6 +51,8 @@ export default async function AnalyticsPage() {
         <h1 className="text-2xl font-semibold tracking-tight">Analytics</h1>
         <p className="text-muted-foreground text-sm">Your study patterns over time.</p>
       </div>
+
+      <WeeklyReportCard data={weeklyReport} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <CompletedTasksSummary counts={completedTasks} />
