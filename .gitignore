@@ -22,7 +22,14 @@
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
+*.bak
+
+# editor / IDE
+.vscode/
+.idea/
+*.swp
 
 # debug
 npm-debug.log*
@@ -50,3 +57,8 @@ next-env.d.ts
 # python skill cache
 __pycache__/
 *.pyc
+
+# AI-assistant / dev tooling (local only, not part of the app)
+.claude/
+AGENTS.md
+CLAUDE.md
