@@ -3,6 +3,7 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Maximize2, Minimize2, Pause, Play, Square } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -142,7 +143,14 @@ export function FocusTimer({
       startedAt: startedAtRef.current,
       subjectId,
       studySessionId: initialStudySessionId,
-    }).then(() => router.refresh());
+    }).then(({ unlockedAchievements }) => {
+      for (const achievement of unlockedAchievements) {
+        toast.success(`Achievement unlocked: ${achievement.name}`, {
+          description: `${achievement.description} (+${achievement.xpReward} XP, +${achievement.coinReward} coins)`,
+        });
+      }
+      router.refresh();
+    });
   }, [
     state.phase,
     state.workSecondsElapsed,

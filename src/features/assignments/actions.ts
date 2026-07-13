@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/infrastructure/db/prisma";
 import { requireUserId } from "@/lib/auth/require-user";
 import { regenerateSchedule } from "@/application/services/regenerate-schedule";
+import { checkAndUnlockAchievements } from "@/application/services/achievements";
 import { assignmentSchema } from "@/features/assignments/schemas";
 import type { FormActionState } from "@/lib/form-action-state";
 
@@ -36,6 +37,7 @@ export async function createAssignmentAction(
   });
 
   await regenerateSchedule(userId);
+  if (parsed.data.progressPercent >= 100) await checkAndUnlockAchievements(userId);
   revalidatePath("/assignments");
   revalidatePath("/dashboard");
   return { success: true };
@@ -63,6 +65,7 @@ export async function updateAssignmentAction(
   if (count === 0) return { error: "Assignment not found." };
 
   await regenerateSchedule(userId);
+  if (parsed.data.progressPercent >= 100) await checkAndUnlockAchievements(userId);
   revalidatePath("/assignments");
   revalidatePath("/dashboard");
   return { success: true };
@@ -79,6 +82,7 @@ export async function updateAssignmentProgressAction(
     data: { progressPercent: clamped, status: statusFromProgress(clamped) },
   });
   await regenerateSchedule(userId);
+  if (clamped >= 100) await checkAndUnlockAchievements(userId);
   revalidatePath("/assignments");
   revalidatePath("/dashboard");
 }

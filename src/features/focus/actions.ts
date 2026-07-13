@@ -6,11 +6,17 @@ import { requireUserId } from "@/lib/auth/require-user";
 import { applyStudyActivity } from "@/application/services/streak";
 import { xpForFocusMinutes, coinsForFocusMinutes } from "@/application/services/gamification";
 import {
+  checkAndUnlockAchievements,
+  type UnlockedAchievement,
+} from "@/application/services/achievements";
+import {
   completeFocusSessionSchema,
   type CompleteFocusSessionInput,
 } from "@/features/focus/schemas";
 
-export async function completeFocusSessionAction(input: CompleteFocusSessionInput): Promise<void> {
+export async function completeFocusSessionAction(
+  input: CompleteFocusSessionInput,
+): Promise<{ unlockedAchievements: UnlockedAchievement[] }> {
   const userId = await requireUserId();
   const parsed = completeFocusSessionSchema.parse(input);
 
@@ -82,8 +88,13 @@ export async function completeFocusSessionAction(input: CompleteFocusSessionInpu
       : []),
   ]);
 
+  const unlockedAchievements =
+    parsed.actualMinutes > 0 ? await checkAndUnlockAchievements(userId) : [];
+
   revalidatePath("/focus");
   revalidatePath("/dashboard");
   revalidatePath("/analytics");
   revalidatePath("/gamification");
+
+  return { unlockedAchievements };
 }
