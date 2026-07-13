@@ -150,8 +150,9 @@ to see the planner generate a schedule.
 3. The build command (`npm run build`) runs `prisma generate` automatically. Apply migrations
    against your production database with `npm run db:deploy` (e.g. as a release step or once
    from your machine against the prod `DIRECT_URL`).
-4. `vercel.json` registers an hourly cron hitting `/api/cron/notifications`; set `CRON_SECRET`
-   so only Vercel Cron (which sends it as a bearer token) can trigger it.
+4. `vercel.json` registers a daily cron (07:00 UTC) hitting `/api/cron/notifications`; set
+   `CRON_SECRET` so only Vercel Cron (which sends it as a bearer token) can trigger it. The
+   Hobby plan allows daily crons; on Pro you can raise the frequency for timelier reminders.
 
 Any Node host works too — run `npm run build` then `npm run start` behind your process manager,
 with the same environment variables set.
