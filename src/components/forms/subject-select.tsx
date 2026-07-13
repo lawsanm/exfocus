@@ -20,15 +20,21 @@ export function SubjectSelect({
   defaultValue,
   placeholder = "Select a subject",
   allowNone = false,
+  onValueChange,
 }: {
   name: string;
   subjects: SubjectOption[];
   defaultValue?: string;
   placeholder?: string;
   allowNone?: boolean;
+  onValueChange?: (value: string | null) => void;
 }) {
   return (
-    <Select name={name} defaultValue={defaultValue ?? (allowNone ? "none" : undefined)}>
+    <Select
+      name={name}
+      defaultValue={defaultValue ?? (allowNone ? "none" : undefined)}
+      onValueChange={onValueChange}
+    >
       <SelectTrigger className="w-full">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

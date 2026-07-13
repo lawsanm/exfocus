@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { CalendarClock, CheckCircle2, Circle } from "lucide-react";
+import { CalendarClock, CheckCircle2, Circle, Play } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { TodayStudySessionDto } from "@/infrastructure/repositories/dashboard-repository";
 
@@ -71,6 +72,20 @@ export function TodayPlanCard({ sessions }: { sessions: TodayStudySessionDto[] }
                 >
                   {session.priorityLevel}
                 </Badge>
+                {session.status !== "COMPLETED" && (
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={`Start focus session for ${session.topicLabel}`}
+                    render={
+                      <Link
+                        href={`/focus?session=${session.id}${session.subjectId ? `&subject=${session.subjectId}` : ""}`}
+                      />
+                    }
+                  >
+                    <Play className="size-3.5" aria-hidden="true" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>

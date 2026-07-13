@@ -4,6 +4,7 @@ import type { PriorityLevel, RelatedItemType, StudySessionStatus } from "@/gener
 
 export interface TodayStudySessionDto {
   id: string;
+  subjectId: string | null;
   topicLabel: string;
   subjectName: string;
   subjectColor: string;
@@ -95,7 +96,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     }),
     prisma.studySession.findMany({
       where: { userId, scheduledDate: { gte: todayStart, lt: todayEnd } },
-      include: { subject: { select: { name: true, colorHex: true } } },
+      include: { subject: { select: { id: true, name: true, colorHex: true } } },
       orderBy: [{ priorityScore: "desc" }],
     }),
     prisma.assignment.findMany({
@@ -188,6 +189,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     user,
     todaySessions: todaySessions.map((s) => ({
       id: s.id,
+      subjectId: s.subject?.id ?? null,
       topicLabel: s.topicLabel,
       subjectName: s.subject?.name ?? "General",
       subjectColor: s.subject?.colorHex ?? "#64748B",

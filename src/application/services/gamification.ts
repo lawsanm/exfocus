@@ -33,3 +33,13 @@ export function getLevelProgress(totalXp: number): LevelProgress {
     progress: xpForNextLevel === 0 ? 1 : xpIntoLevel / xpForNextLevel,
   };
 }
+
+/** 1 XP per completed minute — transparent and easy to reason about. */
+export function xpForFocusMinutes(minutes: number): number {
+  return Math.max(0, Math.round(minutes));
+}
+
+/** 1 coin per 10 completed minutes. */
+export function coinsForFocusMinutes(minutes: number): number {
+  return Math.max(0, Math.floor(minutes / 10));
+}
