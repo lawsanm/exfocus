@@ -136,6 +136,23 @@ describe("generateSchedule", () => {
     expect(urgentFirstSlot!.date.getTime()).toBeLessThanOrEqual(relaxedFirstSlot!.date.getTime());
   });
 
+  it("treats existing commitments as already-used capacity, not something to overwrite", () => {
+    const workItems = [
+      makeWorkItem({ remainingHours: 2, deadline: new Date("2026-01-02T00:00:00Z") }),
+    ];
+    const result = generateSchedule({
+      workItems,
+      availableHoursByWeekday: ALL_DAYS_2H,
+      existingCommitments: [{ date: today, subjectId: "subject-1", hours: 2 }],
+      today,
+    });
+
+    // The day's full 2h capacity (and the subject's burnout allowance) is
+    // already spent by the commitment, so nothing new can be placed today.
+    const todaySlots = result.slots.filter((s) => s.date.getTime() === today.getTime());
+    expect(todaySlots).toHaveLength(0);
+  });
+
   it("produces a study hour recommendation based on remaining hours and nearest deadline", () => {
     const workItems = [
       makeWorkItem({ remainingHours: 10, deadline: new Date("2026-01-06T00:00:00Z") }),

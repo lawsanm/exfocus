@@ -2,17 +2,19 @@ import { generateSchedule } from "@/application/services/scheduling-engine";
 import {
   gatherWorkItems,
   getAvailableHoursByWeekday,
+  getExistingCommitments,
   persistSchedule,
 } from "@/infrastructure/repositories/scheduling-repository";
 import type { SchedulingResult } from "@/domain/entities/scheduling";
 
 async function runEngine(userId: string): Promise<SchedulingResult> {
-  const [workItems, availableHoursByWeekday] = await Promise.all([
+  const [workItems, availableHoursByWeekday, existingCommitments] = await Promise.all([
     gatherWorkItems(userId),
     getAvailableHoursByWeekday(userId),
+    getExistingCommitments(userId),
   ]);
 
-  return generateSchedule({ workItems, availableHoursByWeekday });
+  return generateSchedule({ workItems, availableHoursByWeekday, existingCommitments });
 }
 
 /**
@@ -20,7 +22,9 @@ async function runEngine(userId: string): Promise<SchedulingResult> {
  * schedule. Call this after any mutation to subjects/topics/assignments/
  * exams/quizzes/projects/available-hours so the plan stays in sync —
  * "whenever new academic information is added or updated, the schedule
- * recalculates automatically."
+ * recalculates automatically." Manually rescheduled and already-completed
+ * sessions are treated as fixed capacity the engine plans around rather
+ * than something it can overwrite.
  */
 export async function regenerateSchedule(userId: string): Promise<SchedulingResult> {
   const result = await runEngine(userId);

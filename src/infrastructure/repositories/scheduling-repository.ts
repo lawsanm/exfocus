@@ -1,6 +1,7 @@
 import { prisma } from "@/infrastructure/db/prisma";
 import { DIFFICULTY_WEIGHT } from "@/lib/constants";
 import type { ScheduledSlot, WorkItem } from "@/domain/entities/scheduling";
+import type { ExistingCommitment } from "@/application/services/scheduling-engine";
 
 const GENERAL_SUBJECT = { name: "General", colorHex: "#64748B" };
 const DEFAULT_TOPIC_HORIZON_DAYS = 14;
@@ -197,6 +198,29 @@ export async function getAvailableHoursByWeekday(userId: string): Promise<number
   const hours = new Array(7).fill(2) as number[];
   for (const row of rows) hours[row.dayOfWeek] = row.hours;
   return hours;
+}
+
+/**
+ * Sessions the engine must treat as already-committed capacity rather than
+ * something it can freely place: manually rescheduled sessions (any status)
+ * and sessions already marked completed, both from today forward.
+ */
+export async function getExistingCommitments(userId: string): Promise<ExistingCommitment[]> {
+  const today = new Date();
+  const rows = await prisma.studySession.findMany({
+    where: {
+      userId,
+      scheduledDate: { gte: today },
+      OR: [{ source: "MANUAL" }, { status: "COMPLETED" }],
+    },
+    select: { scheduledDate: true, subjectId: true, durationMinutes: true },
+  });
+
+  return rows.map((row) => ({
+    date: row.scheduledDate,
+    subjectId: row.subjectId,
+    hours: row.durationMinutes / 60,
+  }));
 }
 
 function startOfTodayUtc(): Date {

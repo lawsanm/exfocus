@@ -35,10 +35,20 @@ interface DayBucket {
   subjectHoursUsed: Map<string, number>;
 }
 
+/** Hours already committed to a day/subject outside the engine's control —
+ * e.g. a manually rescheduled or completed session — that must reduce that
+ * day's remaining capacity before auto-generated slots are placed. */
+export interface ExistingCommitment {
+  date: Date;
+  subjectId: string | null;
+  hours: number;
+}
+
 export interface GenerateScheduleParams {
   workItems: WorkItem[];
   /** Index 0 = Sunday .. 6 = Saturday, hours available that weekday. */
   availableHoursByWeekday: number[];
+  existingCommitments?: ExistingCommitment[];
   today?: Date;
   horizonDays?: number;
 }
@@ -46,6 +56,7 @@ export interface GenerateScheduleParams {
 export function generateSchedule({
   workItems,
   availableHoursByWeekday,
+  existingCommitments = [],
   today = new Date(),
   horizonDays = DEFAULT_HORIZON_DAYS,
 }: GenerateScheduleParams): SchedulingResult {
@@ -59,6 +70,18 @@ export function generateSchedule({
       subjectHoursUsed: new Map<string, number>(),
     };
   });
+
+  for (const commitment of existingCommitments) {
+    const dayIndex = daysBetween(startOfToday, commitment.date);
+    if (dayIndex < 0 || dayIndex >= horizonDays) continue;
+    const day = days[dayIndex];
+    const subjectKey = commitment.subjectId ?? "general";
+    day.remainingCapacity = Math.max(0, day.remainingCapacity - commitment.hours);
+    day.subjectHoursUsed.set(
+      subjectKey,
+      (day.subjectHoursUsed.get(subjectKey) ?? 0) + commitment.hours,
+    );
+  }
 
   const activeItems = workItems.filter((item) => item.remainingHours > 0.01);
 
