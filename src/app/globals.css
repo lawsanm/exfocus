@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -211,6 +211,14 @@
   html {
     @apply font-sans;
   }
+  /* Page headings get the display face; shadcn titles (CardTitle, DialogTitle,
+     SheetTitle) already opt in via the font-heading utility. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -273,6 +281,33 @@
       0 2px 4px -2px color-mix(in oklch, var(--foreground) 14%, transparent),
       0 16px 32px -12px color-mix(in oklch, var(--foreground) 22%, transparent);
   }
+}
+
+/* ---------------------------------------------------------------------------
+   FullCalendar theming. FC ships light-only defaults (white sticky header,
+   #ddd borders, yellow today-highlight); mapping its CSS vars onto the design
+   tokens keeps the calendar legible in both themes. Scoped to the
+   .exfocus-calendar wrapper around <FullCalendar /> in calendar-view.tsx.
+   --------------------------------------------------------------------------- */
+.exfocus-calendar {
+  --fc-page-bg-color: var(--card);
+  --fc-border-color: var(--border);
+  --fc-neutral-bg-color: var(--muted);
+  --fc-neutral-text-color: var(--muted-foreground);
+  --fc-today-bg-color: color-mix(in oklch, var(--primary) 10%, transparent);
+  --fc-highlight-color: color-mix(in oklch, var(--primary) 16%, transparent);
+  --fc-list-event-hover-bg-color: var(--accent);
+  --fc-button-text-color: var(--secondary-foreground);
+  --fc-button-bg-color: var(--secondary);
+  --fc-button-border-color: var(--border);
+  --fc-button-hover-bg-color: color-mix(in oklch, var(--secondary), var(--foreground) 6%);
+  --fc-button-hover-border-color: var(--border);
+  --fc-button-active-bg-color: var(--primary);
+  --fc-button-active-border-color: var(--primary);
+}
+.exfocus-calendar .fc-button-primary:not(:disabled).fc-button-active,
+.exfocus-calendar .fc-button-primary:not(:disabled):active {
+  color: var(--primary-foreground);
 }
 
 /* Aurora blobs: large, blurred, slowly drifting gradient orbs behind hero /
