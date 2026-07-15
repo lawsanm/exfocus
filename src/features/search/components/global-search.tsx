@@ -42,6 +42,7 @@ export function GlobalSearch() {
     const timeout = setTimeout(() => {
       searchAction(query)
         .then(setResults)
+        .catch(() => setResults([]))
         .finally(() => setIsSearching(false));
     }, 200);
     return () => clearTimeout(timeout);

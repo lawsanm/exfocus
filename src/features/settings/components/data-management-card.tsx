@@ -26,7 +26,12 @@ export function DataManagementCard() {
           <p className="text-muted-foreground mb-2 text-sm">
             Download all your subjects, assignments, exams, quizzes, and projects as JSON.
           </p>
-          <Button variant="outline" size="sm" render={<a href="/api/export" download />}>
+          <Button
+            variant="outline"
+            size="sm"
+            nativeButton={false}
+            render={<a href="/api/export" download />}
+          >
             <Download className="size-4" />
             Export data
           </Button>

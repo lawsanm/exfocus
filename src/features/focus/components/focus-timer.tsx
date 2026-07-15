@@ -183,7 +183,7 @@ export function FocusTimer({
 
       <div className="flex items-center gap-2">
         {isIdle && (
-          <Button onClick={handleStart} size="lg">
+          <Button onClick={handleStart} size="lg" variant="cta">
             <Play className="size-4" />
             Start
           </Button>
@@ -195,7 +195,7 @@ export function FocusTimer({
           </Button>
         )}
         {!isIdle && !state.isRunning && (
-          <Button onClick={() => dispatch({ type: "resume" })} size="lg">
+          <Button onClick={() => dispatch({ type: "resume" })} size="lg" variant="cta">
             <Play className="size-4" />
             Resume
           </Button>

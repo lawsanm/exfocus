@@ -58,6 +58,11 @@
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
 
+  /* Action accent — high-energy CTAs only (start focus, streak-critical
+     actions). Same hue family as --streak but semantically an action color. */
+  --color-cta: var(--cta);
+  --color-cta-foreground: var(--cta-foreground);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -131,6 +136,10 @@
   --streak-foreground: oklch(0.985 0 0);
   --success: oklch(0.723 0.219 149.579); /* green-500 */
   --success-foreground: oklch(0.985 0 0);
+
+  /* Action orange — reserved for energy CTAs (start focus session). */
+  --cta: oklch(0.705 0.213 47.604); /* orange-500 #F97316 */
+  --cta-foreground: oklch(0.985 0 0);
 }
 
 .dark {
@@ -187,6 +196,9 @@
   --streak-foreground: oklch(0.145 0 0);
   --success: oklch(0.723 0.219 149.579);
   --success-foreground: oklch(0.145 0 0);
+
+  --cta: oklch(0.75 0.183 55.934); /* orange-400 #FB923C */
+  --cta-foreground: oklch(0.266 0.079 36.259); /* deep orange-brown for contrast */
 }
 
 @layer base {

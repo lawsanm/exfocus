@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -52,50 +53,55 @@ export function NotificationBell({
         </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
-        <div className="flex items-center justify-between px-2 py-1.5">
-          <DropdownMenuLabel className="p-0">Notifications</DropdownMenuLabel>
-          {unreadCount > 0 && (
-            <button
-              type="button"
-              className="text-primary text-xs hover:underline"
-              onClick={() => startTransition(() => markAllNotificationsReadAction())}
-            >
-              Mark all read
-            </button>
-          )}
-        </div>
-        <DropdownMenuSeparator />
-        {notifications.length === 0 ? (
-          <p className="text-muted-foreground px-2 py-6 text-center text-sm">
-            You&apos;re all caught up.
-          </p>
-        ) : (
-          <div className="max-h-80 overflow-y-auto">
-            {notifications.map((notification) => (
-              <DropdownMenuItem
-                key={notification.id}
-                className="flex-col items-start gap-0.5"
-                render={notification.relatedUrl ? <Link href={notification.relatedUrl} /> : <div />}
-                onClick={() => {
-                  if (!notification.read) {
-                    startTransition(() => markNotificationReadAction(notification.id));
-                  }
-                }}
+        {/* Base UI requires GroupLabel to live inside a Group. */}
+        <DropdownMenuGroup>
+          <div className="flex items-center justify-between px-2 py-1.5">
+            <DropdownMenuLabel className="p-0">Notifications</DropdownMenuLabel>
+            {unreadCount > 0 && (
+              <button
+                type="button"
+                className="text-primary text-xs hover:underline"
+                onClick={() => startTransition(() => markAllNotificationsReadAction())}
               >
-                <div className="flex w-full items-center gap-2">
-                  {!notification.read && (
-                    <span className="bg-primary size-1.5 shrink-0 rounded-full" />
-                  )}
-                  <span className="truncate text-sm font-medium">{notification.title}</span>
-                </div>
-                <span className="text-muted-foreground text-xs">{notification.body}</span>
-                <span className="text-muted-foreground text-[11px]">
-                  {timeAgo(notification.createdAt)}
-                </span>
-              </DropdownMenuItem>
-            ))}
+                Mark all read
+              </button>
+            )}
           </div>
-        )}
+          <DropdownMenuSeparator />
+          {notifications.length === 0 ? (
+            <p className="text-muted-foreground px-2 py-6 text-center text-sm">
+              You&apos;re all caught up.
+            </p>
+          ) : (
+            <div className="max-h-80 overflow-y-auto">
+              {notifications.map((notification) => (
+                <DropdownMenuItem
+                  key={notification.id}
+                  className="flex-col items-start gap-0.5"
+                  render={
+                    notification.relatedUrl ? <Link href={notification.relatedUrl} /> : <div />
+                  }
+                  onClick={() => {
+                    if (!notification.read) {
+                      startTransition(() => markNotificationReadAction(notification.id));
+                    }
+                  }}
+                >
+                  <div className="flex w-full items-center gap-2">
+                    {!notification.read && (
+                      <span className="bg-primary size-1.5 shrink-0 rounded-full" />
+                    )}
+                    <span className="truncate text-sm font-medium">{notification.title}</span>
+                  </div>
+                  <span className="text-muted-foreground text-xs">{notification.body}</span>
+                  <span className="text-muted-foreground text-[11px]">
+                    {timeAgo(notification.createdAt)}
+                  </span>
+                </DropdownMenuItem>
+              ))}
+            </div>
+          )}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -39,19 +40,22 @@ export function UserMenu({
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="flex flex-col">
-          <span className="truncate text-sm font-medium">{name ?? "Student"}</span>
-          <span className="text-muted-foreground truncate text-xs font-normal">{email}</span>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem render={<Link href="/profile" />}>
-          <UserIcon className="size-4" aria-hidden="true" />
-          Profile
-        </DropdownMenuItem>
-        <DropdownMenuItem render={<Link href="/settings" />}>
-          <Settings className="size-4" aria-hidden="true" />
-          Settings
-        </DropdownMenuItem>
+        {/* Base UI requires GroupLabel to live inside a Group. */}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="flex flex-col">
+            <span className="truncate text-sm font-medium">{name ?? "Student"}</span>
+            <span className="text-muted-foreground truncate text-xs font-normal">{email}</span>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem render={<Link href="/profile" />}>
+            <UserIcon className="size-4" aria-hidden="true" />
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem render={<Link href="/settings" />}>
+            <Settings className="size-4" aria-hidden="true" />
+            Settings
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           variant="destructive"
